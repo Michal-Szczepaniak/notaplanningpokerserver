@@ -23,12 +23,19 @@ SocketIO.on("connection", socket => {
         if (!players.find(el => el.name === data)) {
             let player = {name: data, vote: 0};
             players.push(player);
-            SocketIO.emit("newPlayer", player);
+            SocketIO.emit("playerJoined", player);
         }
         SocketIO.emit("players", players);
 
         checkAndReveal()
     })
+    socket.on("leave", data => {
+        let index = players.findIndex(el => el.name === data);
+        if (index !== -1) {
+            players.splice(index, 1);
+            SocketIO.emit("playerLeft", data);
+        }
+    });
     socket.on("vote", data => {
         let index = players.findIndex(el => el.name === data.name);
         if (index !== -1) {
